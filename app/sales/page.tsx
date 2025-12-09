@@ -1,3 +1,7 @@
+import ClientWrapper from "../ui/sales/wrapper";
+
 export default function Page() {
-  return <p>Pagina de ventas</p>;
+  return (<>
+      <ClientWrapper />
+  </>);
 }

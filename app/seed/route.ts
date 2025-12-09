@@ -11,7 +11,9 @@ async function seedUsers() {
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       email TEXT NOT NULL UNIQUE,
-      password TEXT NOT NULL
+      password TEXT NOT NULL,
+      is_admin BOOLEAN DEFAULT FALSE,
+      is_active BOOLEAN DEFAULT TRUE
     );
   `;
 
@@ -38,7 +40,8 @@ async function seedInvoices() {
       customer_id UUID NOT NULL,
       amount INT NOT NULL,
       status VARCHAR(255) NOT NULL,
-      date DATE NOT NULL
+      date DATE NOT NULL,
+      detail VARCHAR(255)[] DEFAULT '{}',
     );
   `;
 
@@ -62,6 +65,8 @@ async function seedCustomers() {
     CREATE TABLE IF NOT EXISTS customers (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
+      phone VARCHAR(255) NOT NULL,
+      citizen_id VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL,
       image_url VARCHAR(255) NOT NULL
     );
