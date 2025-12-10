@@ -1,21 +1,31 @@
 'use client';
 
 import { useContext } from "react";
-import { ProductsContext, StagesContext } from "../contexts";
+import { StagesContext, FormContext } from "../contexts";
 
 export default function SelectProduct() {
 
-    const { currentStage, setCurrentStage } = useContext<any>(StagesContext);
-    const { selectedProduct, setSelectedProduct } = useContext<any>(ProductsContext);
+    const { setCurrentStage } = useContext<any>(StagesContext);
+    const { formData, setFormData } = useContext<any>(FormContext);
 
     const handleSelectProduct = (product: string) => {
         setCurrentStage('type-address');
-        setSelectedProduct(product);
+        setFormData({
+            ...formData,
+            product: product,
+            details: [...formData.details, { brand: formData.brand, product: product, price: 29900 }]
+        });
     }
 
-
     return (<>
-        <p>Selecciona Producto</p>
+        <p className="text-2xl">Selecciona Producto</p>
+        <div className="my-4">
+            <button
+                className="bg-yellow-500 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded w-full"
+                onClick={() => setCurrentStage('select-brand')}>
+                Volver
+            </button>
+        </div>
         <div className="mt-2">
             <button
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full"

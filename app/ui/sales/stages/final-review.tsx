@@ -1,15 +1,17 @@
 'use client';
 
-import { useContext, useState } from "react";
-import { StagesContext } from "../contexts";
+import { useContext } from "react";
+import { FormContext, StagesContext } from "../contexts";
 
 export default function FinalReview() {
-    const { currentStage, setCurrentStage } = useContext<any>(StagesContext);
+    const { setCurrentStage } = useContext<any>(StagesContext);
+    const { formData } = useContext<any>(FormContext);
     const handleNextButton = () => {
+        console.log("Finalizando venta con datos:", formData);
         setCurrentStage('final-review');
     }
     return (<>
-        <p className="font-bold mt-2">Revisión y confirmación</p>
+        <p className="text-2xl mt2">Revisión y confirmación</p>
         <div className="mt-4">
             <table className="table-auto w-full font-bold">
                 <tbody>

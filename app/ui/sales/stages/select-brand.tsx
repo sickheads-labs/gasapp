@@ -1,18 +1,22 @@
 'use client';
 
-import { use, useContext } from "react";
-import { BrandsContext, StagesContext } from "../contexts";
+import { useContext } from "react";
+import { StagesContext, FormContext } from "../contexts";
 
 export default function SelectBrand() {
-  const {currentStage, setCurrentStage} = useContext<any>(StagesContext);
-  const {selectedBrand, setSelectedBrand} = useContext<any>(BrandsContext);
+  const { setCurrentStage } = useContext<any>(StagesContext);
+  const { formData, setFormData } = useContext<any>(FormContext);
   const handleSelectBrand = (brand: string) => {
     setCurrentStage('select-product');
-    setSelectedBrand(brand);
+    setFormData({
+      ...formData,
+      brand: brand,
+    });
   }
 
   return (<>
-    <p>Selecciona Marca</p>
+    <p className="text-2xl">Selecciona Marca</p>
+
     <div className="mt-2">
       <button
         className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded w-full"
@@ -27,7 +31,7 @@ export default function SelectBrand() {
     </div>
     <div className="mt-2">
       <button className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded w-full"
-      onClick={() => handleSelectBrand('Lippigas')}>Lippigas</button>
+        onClick={() => handleSelectBrand('Lippigas')}>Lippigas</button>
     </div>
   </>)
 }

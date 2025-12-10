@@ -1,5 +1,5 @@
 'use client';
-import { StagesContext, BrandsContext, ProductsContext } from "./contexts";
+import { StagesContext, FormContext } from "./contexts";
 import { useState } from "react";
 import SelectBrand from "./stages/select-brand";
 import SelectProduct from "./stages/select-product";
@@ -10,21 +10,26 @@ import FinalReview from "./stages/final-review";
 
 export default function Wrap() {
   const [currentStage, setCurrentStage] = useState('select-brand');
-  const [selectedBrand, setSelectedBrand] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [formData, setFormData] = useState({
+    brand: '',
+    product: '',
+    address: '',
+    total: 0,
+    discounts: [],
+    payments: [],
+    details: [],
+  });
   return (<>
-    <h1>App / Nueva venta{!!selectedBrand && ` / ${selectedBrand}`}{!!selectedProduct && ` / ${selectedProduct}`}</h1>
+    <h1>App / Nueva venta{!!formData.brand && ` / ${formData?.brand}`}{!!formData.product && ` / ${formData?.product}`}</h1>
     <StagesContext value={{currentStage, setCurrentStage}}>
-      <BrandsContext value={{selectedBrand, setSelectedBrand}}>
-        <ProductsContext value={{selectedProduct, setSelectedProduct}}>
+      <FormContext value={{formData, setFormData}}>
           {(currentStage === 'select-brand') && <SelectBrand />}
           {(currentStage === 'select-product') && <SelectProduct />}
           {(currentStage === 'type-address') && <TypeAddress />}
           {(currentStage === 'apply-discounts') && <ApplyDiscounts />}
           {(currentStage === 'add-payments') && <AddPayments />}
           {(currentStage === 'final-review') && <FinalReview />}
-        </ProductsContext>
-      </BrandsContext>
+      </FormContext>
     </StagesContext>
   </>);
 }
