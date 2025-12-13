@@ -2,6 +2,7 @@
 
 import { useContext } from "react";
 import { FormContext, StagesContext } from "../contexts";
+import Details from "../details";
 
 export default function TypeAddress() {
     const { setCurrentStage } = useContext<any>(StagesContext);
@@ -11,19 +12,13 @@ export default function TypeAddress() {
     }
 
     return (<>
-        <p className="text-2xl">Ingresa Dirección</p>
-        <div className="my-4">
-            <button
-                className="bg-yellow-500 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded w-full"
-                onClick={() => setCurrentStage('select-product')}>
-                Volver
-            </button>
-        </div>
+        <p className="text-2xl mt-4">Ingresa Dirección</p>
         <div className="mt-2">
             <input
                 type="text"
                 placeholder="Dirección"
                 className="border border-gray-300 rounded w-full py-2 px-4"
+                value={formData.address}
                 onChange={(e) => {
                     const address = (e.target as HTMLInputElement).value;
                     setFormData({
@@ -33,11 +28,20 @@ export default function TypeAddress() {
                 }}
             />
         </div>
+        <Details />
         <div className="mt-4">
             <button
                 className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded w-full"
                 onClick={handleNextButton}>Continuar
             </button>
         </div>
+        <div className="my-4">
+            <button
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-full"
+                onClick={() => setCurrentStage('select-product')}>
+                Volver
+            </button>
+        </div>
+        
     </>)
 } 
