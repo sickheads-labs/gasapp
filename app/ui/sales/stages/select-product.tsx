@@ -6,7 +6,6 @@ import { StagesContext, FormContext } from "../contexts";
 
 export default function SelectProduct() {
 
-    const searchParams = useSearchParams()
     const router = useRouter()
     const { setCurrentStage } = useContext<any>(StagesContext);
     const { formData, setFormData } = useContext<any>(FormContext);
@@ -69,16 +68,8 @@ export default function SelectProduct() {
         });
     }
 
-    const search = searchParams.get('t')
-    useEffect(() => {
-
-        if (search) {
-            console.log("Search detected.");
-        }
-    }, []);
-
     return (<>
-        {search && <div className="bg-blue-200 rounded p-2 border m-1 border-blue-400">
+        {false && <div className="bg-blue-200 rounded p-2 border m-1 border-blue-400">
             <p className="text-blue-700 font-bold text-xl">Exito</p>
             <p className="text-blue-700 text-xl">Venta guardada con éxito</p>
             <div className="mt-2 flex justify-start">
