@@ -18,7 +18,7 @@ export default function Wrap() {
     details: [],
   });
   useEffect(() => {
-    console.log('form Stage:', formData);
+    console.log('form data:', formData);
   }, [formData]);
   return (<>
     <h1>App / Nueva venta</h1>

@@ -1,0 +1,138 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  AUDITOR
+  MANAGER
+  SELLER
+  GUEST
+}
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  name             String?
+  password         String
+  role             UserRole  @default(GUEST)
+  sales            Sale[]
+  seller_outcomes  Outcome[] @relation("seller_outcomes")
+  manager_outcomes Outcome[] @relation("manager_outcomes")
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+}
+
+model Outcome {
+  id               String   @id @default(cuid())
+  amount           Float
+  voucher_quantity Int
+  coupon_quantity  Int
+  description      String?
+  seller_id        String
+  seller           User     @relation(fields: [seller_id], references: [id], name: "seller_outcomes")
+  manager_id       String
+  manager          User     @relation(fields: [manager_id], references: [id], name: "manager_outcomes")
+  sales            Sale[]
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+}
+
+model Sale {
+  id              String             @id @default(cuid())
+  bill_id         String
+  bill_type       String
+  total           Float
+  total_original  Float?
+  total_discounts Float?
+  address         String?
+  seller_id       String
+  seller          User               @relation(fields: [seller_id], references: [id])
+  outcome_id      String?
+  outcome         Outcome?           @relation(fields: [outcome_id], references: [id])
+  details         SaleDetailLine[]
+  payments        SalePaymentLine[]
+  discounts       SaleDiscountLine[]
+  created_at      DateTime           @default(now())
+  updated_at      DateTime           @updatedAt
+}
+
+model SaleDetailLine {
+  id         String @id @default(cuid())
+  sale_id    String
+  sale       Sale   @relation(fields: [sale_id], references: [id])
+  brand      String
+  product    String
+  quantity   Int
+  unit_price Float
+  total      Float
+}
+
+model SalePaymentLine {
+  id                 String  @id @default(cuid())
+  sale_id            String
+  sale               Sale    @relation(fields: [sale_id], references: [id])
+  method             String
+  code               String
+  amount             Float
+  authorization_code String?
+  folio              String?
+  brand              String?
+}
+
+model SaleDiscountLine {
+  id          String  @id @default(cuid())
+  sale_id     String
+  sale        Sale    @relation(fields: [sale_id], references: [id])
+  type        String
+  code        String
+  amount      Float
+  quantity    Int
+  description String?
+  total       Float
+}
+
+model Stock {
+  id             String            @id @default(cuid())
+  brand          String
+  product        String
+  store_name     String?
+  full_quantity  Int
+  total_quantity Int
+  refillments    StockRefillment[]
+  adjustments    StockAdjustment[]
+  created_at     DateTime          @default(now())
+  updated_at     DateTime          @updatedAt
+}
+
+model StockRefillment {
+  id             String   @id @default(cuid())
+  stock_id       String
+  stock          Stock    @relation(fields: [stock_id], references: [id])
+  quantity       Int
+  description    String?
+  purchase_order String?
+  created_at     DateTime @default(now())
+}
+
+model StockAdjustment {
+  id          String   @id @default(cuid())
+  stock_id    String
+  stock       Stock    @relation(fields: [stock_id], references: [id])
+  quantity    Int
+  type        String
+  description String?
+  created_at  DateTime @default(now())
+}
+

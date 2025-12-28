@@ -9,3 +9,16 @@ export async function checkClientToken(token: string): Promise<boolean> {
     });
 }
 
+
+export async function authorization(requestHeaders: any) {
+    const authorizationHeader = requestHeaders.get('Authorization') || '';
+    if (authorizationHeader === '') {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const token = authorizationHeader.replace('Bearer ', '');
+    const isValid = await checkClientToken(token);
+    if (!isValid) {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+}
+

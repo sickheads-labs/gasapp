@@ -86,3 +86,16 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+export type Sale = {
+  id: string;
+  amount: number;
+  seller_id: string;
+  outcome_id?: string;
+  details: any[];
+  payments: any[];
+  discounts: any[];
+  created_at: string;
+  updated_at: string;
+
+}

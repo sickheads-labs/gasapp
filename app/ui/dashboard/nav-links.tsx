@@ -15,8 +15,8 @@ import clsx from 'clsx';
 const links = [
   { name: 'Inicio', href: '/dashboard', icon: HomeIcon },
   //{ name: 'Config. SII', href: '/dashboard/sii-config', icon: BanknotesIcon },
-  //{ name: 'Boletas', href: '/dashboard/invoices', icon: DocumentDuplicateIcon },
-  { name: 'Clientes', href: '/dashboard/customers', icon: UserGroupIcon },
+  //{ name: 'Boletas', href: '/dashboard/invoices', icon: UserGroupIcon },
+  { name: 'Entregas', href: '/outcomes', icon: DocumentDuplicateIcon },
   { name: 'Ventas', href: '/sales', icon: ShoppingCartIcon },
   
 ];

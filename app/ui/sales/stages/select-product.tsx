@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
+import { useSearchParams, useRouter } from 'next/navigation'
 import { StagesContext, FormContext } from "../contexts";
 
 export default function SelectProduct() {
 
+    const searchParams = useSearchParams()
+    const router = useRouter()
     const { setCurrentStage } = useContext<any>(StagesContext);
     const { formData, setFormData } = useContext<any>(FormContext);
     const [saleDetails, setSaleDetails] = useState<any>({
@@ -20,7 +23,7 @@ export default function SelectProduct() {
     });
 
     const handleNextButton = () => {
-        
+
         const details = Object.entries(saleDetails).map(([brand, products]: [string, any]) => {
             return Object.entries(products).map(([product, quantity]: [string, any]) => {
                 if (quantity > 0) {
@@ -54,7 +57,7 @@ export default function SelectProduct() {
     }
 
     const subtractProductFromDetails = (brand: string, product: string, quantity: number) => {
-        if(saleDetails[brand.toLowerCase()][product] + quantity === 1) {
+        if (saleDetails[brand.toLowerCase()][product] + quantity === 1) {
             return;
         }
         setSaleDetails({
@@ -66,7 +69,25 @@ export default function SelectProduct() {
         });
     }
 
+    const search = searchParams.get('t')
+    useEffect(() => {
+
+        if (search) {
+            console.log("Search detected.");
+        }
+    }, []);
+
     return (<>
+        {search && <div className="bg-blue-200 rounded p-2 border m-1 border-blue-400">
+            <p className="text-blue-700 font-bold text-xl">Exito</p>
+            <p className="text-blue-700 text-xl">Venta guardada con éxito</p>
+            <div className="mt-2 flex justify-start">
+                <button className="bg-gray-200 border-gray-400 hover:bg-gray-300 text-gray-800 border py-1 px-3 mt-3 rounded w-full" 
+                onClick={() => {
+                    router.replace('/sales');
+                }}>Cerrar</button>
+            </div>
+        </div>}
         <p className="text-2xl">Selecciona Producto</p>
         <div className="mt-2">
             <p className="bg-orange-500 text-white font-bold flex items-center justify-center rounded-full p-2 text-xl">Abastible</p>

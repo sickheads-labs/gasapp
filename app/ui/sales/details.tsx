@@ -2,7 +2,7 @@ import { useContext, useEffect } from "react";
 import { FormContext } from "./contexts";
 
 export default function Details() {
-    const { formData, setFormData } = useContext<any>(FormContext);
+    const { formData } = useContext<any>(FormContext);
     return (<>
         <h2 className="text-xl mt-6 mb-2">Detalles de la Venta</h2>
         <table className="min-w-full divide-y divide-gray-200">
@@ -53,6 +53,6 @@ export default function Details() {
                 ))}
             </tbody>
         </table>
-        {formData.payments.length > 0 && <p className="mt-4 font-bold">Total: ${(formData.payments.reduce((acc: number, item: any) => acc + item.amount, 0)).toLocaleString('es-cl')}</p>}
+        {formData.payments.length > 0 && <p className="mt-4 font-bold">Total pagado: ${(formData.payments.reduce((acc: number, item: any) => acc + item.amount, 0)).toLocaleString('es-cl')}</p>}
     </>);
 }

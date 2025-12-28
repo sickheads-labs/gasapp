@@ -1,141 +1,135 @@
 'use client';
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FormContext, StagesContext } from "../contexts";
 import Details from "../details";
 import SlideUpPanel from "../bottom";
-import { useRouter } from "next/navigation";
+import { saveSale } from "@/app/lib/actions";
 
 export default function AddPayments() {
-    const router = useRouter();
     const { setCurrentStage } = useContext<any>(StagesContext);
     const { formData, setFormData } = useContext<any>(FormContext);
     const [isSlideUpOpen, setIsSlideUpOpen] = useState(true);
     const [activeButton, setActiveButton] = useState('efectivo');
     const [paymentsMap, setPaymentsMap] = useState<any>({
-        efectivo: { code: 'efe', amount: 0 },
-        debito: { code: 'deb', amount: 0, authorizationCode: 0 },
-        credito: { code: 'cre', amount: 0, authorizationCode: 0, installments: 0 },
+        efectivo: { code: 'efe', amount: '' },
+        debito: { code: 'deb', amount: '', authorizationCode: '' },
+        credito: { code: 'cre', amount: '', authorizationCode: '', installments: '' },
         vale: {
             abastible: {
                 code: 'val',
-                amount: 0,
-                folio: 0
+                amount: '',
+                folio: ''
             },
             gasco: {
                 code: 'val',
-                amount: 0,
-                folio: 0
+                amount: '',
+                folio: ''
             },
             lipigas: {
                 code: 'val',
-                amount: 0,
-                folio: 0
+                amount: '',
+                folio: ''
             },
         }
     });
+    const [errorMessage, setErrorMessage] = useState('');
     const handleAddPayment = () => {
-        
-        if (activeButton === 'efectivo') {
-            setFormData({
-                ...formData,
-                payments: [...formData.payments, {
-                    method: 'Efectivo',
-                    code: 'efe',
-                    amount: paymentsMap.efectivo.amount
-                }]
-            });
-            setPaymentsMap({
-                ...paymentsMap,
-                efectivo: {
-                    ...paymentsMap.efectivo,
-                    amount: 0
-                }
+        const payments = [];
+        const cashAmount = parseInt((paymentsMap.efectivo.amount || '0').toString().replace(/\$|\./g, ''));
+        if (cashAmount > 0) {
+            payments.push({
+                method: 'Efectivo',
+                code: 'efe',
+                amount: cashAmount
             });
         }
-        if (activeButton === 'debito') {
-            console.log('Débito seleccionado');
-            setFormData({
-                ...formData,
-                payments: [...formData.payments, {
-                    method: 'Tarjeta débito',
-                    code: 'deb',
-                    amount: paymentsMap.debito.amount
-                }]
+        const debitAmount = parseInt((paymentsMap.debito.amount || '0').toString().replace(/\$|\./g, ''));
+        if (debitAmount > 0) {
+            payments.push({
+                method: 'Tarjeta débito',
+                code: 'deb',
+                amount: debitAmount,
+                authorizationCode: paymentsMap.debito.authorizationCode
             });
-            setPaymentsMap({
-                ...paymentsMap,
-                debito: {
-                    ...paymentsMap.debito,
+        }
+        const creditAmount = parseInt((paymentsMap.credito.amount || '0').toString().replace(/\$|\./g, ''));
+        if (creditAmount > 0) {
+            payments.push({
+                method: 'Tarjeta crédito',
+                code: 'cre',
+                amount: creditAmount,
+                authorizationCode: paymentsMap.credito.authorizationCode
+            });
+        }
+        const brands = Object.keys(paymentsMap.vale);
+        brands.forEach((brand) => {
+            const brandAmount = parseInt((paymentsMap.vale[brand].amount || '0').toString().replace(/\$|\./g, ''));
+            if (brandAmount > 0) {
+                payments.push({
+                    method: 'Vale ' + brand.charAt(0).toUpperCase() + brand.slice(1),
+                    code: 'val',
+                    brand,
+                    amount: brandAmount,
+                    folio: paymentsMap.vale[brand].folio
+                });
+            }
+        });
+        setPaymentsMap({
+            ...paymentsMap,
+            efectivo: {
+                ...paymentsMap.efectivo,
+                amount: 0
+            },
+            credito: {
+                ...paymentsMap.credito,
+                amount: 0,
+                authorizationCode: 0
+            },
+            debito: {
+                ...paymentsMap.debito,
+                amount: 0,
+                authorizationCode: 0
+            },
+            vale: {
+                abastible: {
+                    ...paymentsMap.vale.abastible,
                     amount: 0,
-                    authorizationCode: 0
-                }
-            });
-        }
-        if (activeButton === 'credito') {
-            console.log('Crédito seleccionado');
-            setFormData({
-                ...formData,
-                payments: [...formData.payments, {
-                    method: 'Tarjeta crédito',
-                    code: 'cre',
-                    amount: paymentsMap.credito.amount
-                }]
-            });
-            setPaymentsMap({
-                ...paymentsMap,
-                credito: {
-                    ...paymentsMap.credito,
+                    folio: 0
+                },
+                gasco: {
+                    ...paymentsMap.vale.gasco,
                     amount: 0,
-                    authorizationCode: 0
-                }
-            });
-        }
-        if (activeButton === 'vale') {
-            console.log('Vale seleccionado');
-            const brands = Object.keys(paymentsMap.vale);
-            brands.forEach((brand) => {
-                if (paymentsMap.vale[brand].amount > 0) {
-                    setFormData((prevFormData: any) => ({
-                        ...prevFormData,
-                        payments: [...prevFormData.payments, {
-                            method: 'Vale ' + brand.charAt(0).toUpperCase() + brand.slice(1),
-                            code: 'val',
-                            brand: brand,
-                            amount: paymentsMap.vale[brand].amount,
-                            folio: paymentsMap.vale[brand].folio
-                        }]
-                    }));
-                }
-            });
-            setPaymentsMap({
-                ...paymentsMap,
-                vale: {
-                    abastible: {
-                        ...paymentsMap.vale.abastible,
-                        amount: 0,
-                        folio: 0
-                    },
-                    gasco: {
-                        ...paymentsMap.vale.gasco,
-                        amount: 0,
-                        folio: 0
-                    },
-                    lipigas: {
-                        ...paymentsMap.vale.lipigas,
-                        amount: 0,
-                        folio: 0
-                    },
-                }
-            });
-        }
+                    folio: 0
+                },
+                lipigas: {
+                    ...paymentsMap.vale.lipigas,
+                    amount: 0,
+                    folio: 0
+                },
+            }
+        });
+        setFormData({
+            ...formData,
+            payments: [...formData.payments, ...payments]
+        });
         setIsSlideUpOpen(false);
     }
-    const handleFinishSale = () => {
+    const handleFinishSale = async () => {
         console.log("Finalizando venta con datos:", formData);
-        alert("Venta finalizada.");
-        router.push('/dashboard');
+        try {
+            const sale = await saveSale(formData);
+            console.log('Sale saved successfully', { sale });
+            location.href = `/sales?t=${sale.sale_id}`;
+        } catch (error) {
+            setErrorMessage('Error al guardar la venta. Por favor, inténtalo de nuevo.');
+            console.error('Error saving sale:', error);
+        }
     }
     return (<>
+        {errorMessage && <div className="bg-red-200 rounded p-3 border m-1 border-red-400">
+            <p className="text-red-500 font-bold">Error</p>
+            <p className="text-red-500">{errorMessage}</p>
+        </div>}
         <p className="text-2xl mt-4">Agregar metodo de pago</p>
         <Details />
         <div className="mt-4">
@@ -159,33 +153,34 @@ export default function AddPayments() {
         </div>
         <div className="mt-2">
             <SlideUpPanel isOpen={isSlideUpOpen}>
-                <div>
-                    <p className="text-lg mb-2">Selecciona método de pago</p>
+                <div className="flex">
+                    <p className="text-lg flex-1 mb-2">Selecciona método de pago.</p>
+                    <p className="text-right mb-2 flex-1 font-bold">Total: ${formData.total.toLocaleString('es-CL')}</p>
                 </div>
                 <div className="row flex w-full">
                     <button
-                        className={`rounded-md w-full rounded-r-none ${activeButton === 'efectivo' ? 'bg-blue-500 font-bold' : 'bg-blue-800'} py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-blue-700 focus:shadow-none active:bg-blue-700 hover:bg-blue-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none`}
+                        className={`rounded-md w-full rounded-r-none ${activeButton === 'efectivo' ? 'bg-indigo-500 font-bold' : 'bg-indigo-800'} py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-indigo-700 focus:shadow-none active:bg-indigo-700 hover:bg-indigo-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none`}
                         type="button"
                         onClick={() => setActiveButton('efectivo')}
                     >
                         Efectivo
                     </button>
                     <button
-                        className={`rounded-none w-full ${activeButton === 'debito' ? 'bg-blue-500 font-bold' : 'bg-blue-800'} py-2 px-4 border-l border-r border-blue-700 text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-blue-700 focus:shadow-none active:bg-blue-700 hover:bg-blue-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none`}
+                        className={`rounded-none w-full ${activeButton === 'debito' ? 'bg-indigo-500 font-bold' : 'bg-indigo-800'} py-2 px-4 border-l border-r border-indigo-700 text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-indigo-700 focus:shadow-none active:bg-indigo-700 hover:bg-indigo-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none`}
                         type="button"
                         onClick={() => setActiveButton('debito')}
                     >
                         Débito
                     </button>
                     <button
-                        className={`rounded-none w-full ${activeButton === 'credito' ? 'bg-blue-500 font-bold' : 'bg-blue-800'} py-2 px-4 border-l border-r border-blue-700 text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-blue-700 focus:shadow-none active:bg-blue-700 hover:bg-blue-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none`}
+                        className={`rounded-none w-full ${activeButton === 'credito' ? 'bg-indigo-500 font-bold' : 'bg-indigo-800'} py-2 px-4 border-l border-r border-indigo-700 text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-indigo-700 focus:shadow-none active:bg-indigo-700 hover:bg-indigo-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none`}
                         type="button"
                         onClick={() => setActiveButton('credito')}
                     >
                         Crédito
                     </button>
                     <button
-                        className={`rounded-md w-full rounded-l-none ${activeButton === 'vale' ? 'bg-blue-500 font-bold' : 'bg-blue-800'} py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-blue-700 focus:shadow-none active:bg-blue-700 hover:bg-blue-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none`}
+                        className={`rounded-md w-full rounded-l-none ${activeButton === 'vale' ? 'bg-indigo-500 font-bold' : 'bg-indigo-800'} py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-indigo-700 focus:shadow-none active:bg-indigo-700 hover:bg-indigo-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none`}
                         type="button"
                         onClick={() => setActiveButton('vale')}
                     >
@@ -230,16 +225,21 @@ function Efectivo({
             value={paymentsMap.efectivo.amount || ''}
             onChange={(e) => {
                 const value = (e.target as HTMLInputElement).value;
+                const formattedValue = moneyFormat(value);
                 setPaymentsMap({
                     ...paymentsMap,
                     efectivo: {
                         ...paymentsMap.efectivo,
-                        amount: parseFloat(value)
+                        amount: value === '$' ? '' : formattedValue,
                     }
                 })
             }}
         />
     </>);
+}
+
+function moneyFormat(value: string) {
+    return `$${parseInt(value.replace(/\$|\./g, '') || '0').toLocaleString('es-CL')}`;
 }
 
 function Debito({
@@ -258,11 +258,12 @@ function Debito({
             value={paymentsMap.debito.amount || ''}
             onChange={(e) => {
                 const value = (e.target as HTMLInputElement).value;
+                const formattedValue = moneyFormat(value);
                 setPaymentsMap({
                     ...paymentsMap,
                     debito: {
                         ...paymentsMap.debito,
-                        amount: parseFloat(value),
+                        amount: value === '$' ? '' : formattedValue,
                     }
 
                 })
@@ -302,11 +303,12 @@ function Credito({
             value={paymentsMap.credito.amount || ''}
             onChange={(e) => {
                 const value = (e.target as HTMLInputElement).value;
+                const formattedValue = moneyFormat(value);
                 setPaymentsMap({
                     ...paymentsMap,
                     credito: {
                         ...paymentsMap.credito,
-                        amount: parseFloat(value),
+                        amount: value === '$' ? '' : formattedValue,
                     }
 
                 })
@@ -347,13 +349,14 @@ function Vale({
                 value={paymentsMap.vale.abastible.amount || ''}
                 onChange={(e) => {
                     const value = (e.target as HTMLInputElement).value;
+                    const formattedValue = moneyFormat(value);
                     setPaymentsMap({
                         ...paymentsMap,
                         vale: {
                             ...paymentsMap.vale,
                             abastible: {
                                 ...paymentsMap.vale.abastible,
-                                amount: parseFloat(value),
+                                amount: value === '$' ? '' : formattedValue,
                             }
                         }
                     })
@@ -390,13 +393,14 @@ function Vale({
                 value={paymentsMap.vale.gasco.amount || ''}
                 onChange={(e) => {
                     const value = (e.target as HTMLInputElement).value;
+                    const formattedValue = moneyFormat(value);
                     setPaymentsMap({
                         ...paymentsMap,
                         vale: {
                             ...paymentsMap.vale,
                             gasco: {
                                 ...paymentsMap.vale.gasco,
-                                amount: parseFloat(value),
+                                amount: value === '$' ? '' : formattedValue,
                             }
                         }
                     })
@@ -431,14 +435,15 @@ function Vale({
                 className="border border-gray-300 rounded w-full py-2 px-4 mt-2"
                 value={paymentsMap.vale.lipigas.amount || ''}
                 onChange={(e) => {
-                    const amount = parseFloat((e.target as HTMLInputElement).value);
+                    const value = (e.target as HTMLInputElement).value;
+                    const formattedValue = moneyFormat(value);
                     setPaymentsMap({
                         ...paymentsMap,
                         vale: {
                             ...paymentsMap.vale,
                             lipigas: {
                                 ...paymentsMap.vale.lipigas,
-                                amount,
+                                amount: value === '$' ? '' : formattedValue,
                             }
                         }
                     })
