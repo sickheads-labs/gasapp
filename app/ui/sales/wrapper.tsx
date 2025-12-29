@@ -21,7 +21,7 @@ export default function Wrap() {
     console.log('form data:', formData);
   }, [formData]);
   return (<>
-    <h1>App / Nueva venta</h1>
+    <h1>App / Venta</h1>
     <StagesContext value={{currentStage, setCurrentStage}}>
       <FormContext value={{formData, setFormData}}>
           {(currentStage === 'select-product') && <SelectProduct />}

@@ -10,6 +10,7 @@ export default function AddPayments() {
     const { formData, setFormData } = useContext<any>(FormContext);
     const [isSlideUpOpen, setIsSlideUpOpen] = useState(true);
     const [activeButton, setActiveButton] = useState('efectivo');
+    const [lockedButtons, setLockedButtons] = useState<boolean>(false);
     const [paymentsMap, setPaymentsMap] = useState<any>({
         efectivo: { code: 'efe', amount: '' },
         debito: { code: 'deb', amount: '', authorizationCode: '' },
@@ -116,10 +117,12 @@ export default function AddPayments() {
     }
     const handleFinishSale = async () => {
         console.log("Finalizando venta con datos:", formData);
+        setLockedButtons(true);
         try {
             const sale = await saveSale(formData);
             console.log('Sale saved successfully', { sale });
-            location.href = `/sales?t=${sale.sale_id}`;
+            //location.href = `/sales?t=${sale.sale_id}`;
+            setCurrentStage('final-review');
         } catch (error) {
             setErrorMessage('Error al guardar la venta. Por favor, inténtalo de nuevo.');
             console.error('Error saving sale:', error);
@@ -135,20 +138,22 @@ export default function AddPayments() {
         <div className="mt-4">
             <button
                 className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded w-full"
-                onClick={() => setIsSlideUpOpen(true)}>Agregar método de pago
+                onClick={() => setIsSlideUpOpen(true)}
+                disabled={lockedButtons}>Agregar método de pago
             </button>
         </div>
         <div className="mt-4">
             <button
                 className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded w-full"
-                onClick={() => handleFinishSale()}>Finalizar venta
+                onClick={() => handleFinishSale()}
+                disabled={lockedButtons}>Finalizar venta
             </button>
         </div>
         <div className="mt-4">
             <button
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-full"
-                onClick={() => setCurrentStage('apply-discounts')}>
-                Volver
+                onClick={() => setCurrentStage('apply-discounts')}
+                disabled={lockedButtons}>Volver
             </button>
         </div>
         <div className="mt-2">

@@ -2,6 +2,7 @@ export default function Information({
     type,
     title,
     children,
+    showButton = true,
     onClose = () => { location.reload(); }
 }: any) {
     const typeStyles: any = {
@@ -13,9 +14,9 @@ export default function Information({
         <div className={`rounded p-3 border m-1 ${typeStyles[type]}`}>
             <h1 className={`${typeStyles[type]} font-bold`}>{title}</h1>
             <p className={`${typeStyles[type]}`}>{children}</p>
-            <button className="bg-gray-200 border-gray-400 hover:bg-gray-300 text-gray-800 border py-1 px-3 mt-3 rounded w-full" 
+            {showButton && <button className="bg-gray-200 border-gray-400 hover:bg-gray-300 text-gray-800 border py-1 px-3 mt-3 rounded w-full" 
                 onClick={() => {
                     onClose();
-                }}>Cerrar</button>
+                }}>Cerrar</button>}
         </div>);
 }
